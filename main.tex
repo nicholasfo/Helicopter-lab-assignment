@@ -1,0 +1,49 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet} %Fikser skrifttype
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{bm}
+
+\title{Helicopter lab assignment report}
+\author{Gruppe 33\\ \\Edda Solem - 768666\\Nicholas Fraser Ødegård - 768620\\ Arild Stenset - 768662 }
+\date{October 2017}
+
+\begin{document}
+
+\begin{titlepage}
+    \maketitle
+    \begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/itk_ntnu}\\
+    Department of Engineering Cybernetics
+    \end{figure}
+    \thispagestyle{empty}
+\end{titlepage}
+
+\maketitle
+
+\newpage
+\tableofcontents
+\thispagestyle{empty} % Avoid page numbering on the table of contents.
+
+\newpage
+\setcounter{page}{1}
+\include{introduction}
+\include{part1}
+\include{part2}
+\include{part3}
+\include{part4}
+\include{vedlegg_part1}
+\include{vedlegg_part3}
+\include{vedlegg_part4}
+
+\newpage
+\nocite{*}
+\bibliographystyle{unsrt} %Fikser silen til biblioteket sånn at ingenting går til helvete
+\addcontentsline{toc}{section}{References} %Legger til kildeliste i table of content
+\bibliography{kilder} %Printer referanser
+
+\end{document}

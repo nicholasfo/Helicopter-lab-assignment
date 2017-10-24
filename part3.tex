@@ -1,0 +1,240 @@
+\section{Part III - Multivariable control}
+In this section we are going to control the helicopter using the pitch angle $\tilde{p}$ and the elevation rate $\dot{\tilde{e}}$. Our referance for the pitch angle and the elevation rate are provided by the output of the joystick. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Problem 1}
+
+We are given the following states
+
+\begin{equation}
+  \label{eq:state_space_vectors}
+  \bm{x} =
+  \begin{bmatrix}
+    \tilde{p} \\
+    \dot{\tilde{p}} \\
+    \dot{\tilde{e}} \\
+  \end{bmatrix} ,
+  \quad \bm{u} =
+  \begin{bmatrix}
+    \tilde{V}_s \\
+    \tilde{V}_d \\
+  \end{bmatrix}
+\end{equation}
+
+and we want a state-space formulation on the form
+
+\begin{align}
+  \begin{split}
+    \dot{\bm{x}} &= \bm{Ax} + \bm{Bu} \\
+    \bm{y} &= \bm{Cx}
+  \end{split}
+\end{align}
+
+this gives us the following matrices for $\bm{A}$ and $\bm{B}$
+
+\begin{equation}
+  \boldsymbol{A} = \begin{bmatrix}
+    0 & 1 & 0 \\
+    0 & 0 & 0 \\
+    0 & 0 & 0 \\
+  \end{bmatrix}, \hspace{0.5cm}
+  \boldsymbol{B} = \begin{bmatrix}
+    0 & 0 \\
+    0 & K_1 \\
+    K_2 & 0 \\
+  \end{bmatrix}
+\end{equation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Problem 2}
+
+
+At first we will examine the controllability of our system by finding the rank of the controllability matrix $\boldsymbol{\mathcal{C}}$ using the following formula for $\boldsymbol{\mathcal{C}}$
+
+\begin{equation}
+  \boldsymbol{\mathcal{C}} = \begin{bmatrix}
+    \boldsymbol{B} & \boldsymbol{AB} & \boldsymbol{A^2B}
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    0 & 0   & 0 & K_1 & 0 & 0\\
+    0 & K_1 & 0 & 0   & 0 & 0\\
+    K_2 & 0 & 0 & 0   & 0 & 0\\
+  \end{bmatrix}
+\end{equation}
+
+ $rank(\bm{\mathcal{C}}) = 3$, and by this we are concluding that our system is controllable.
+
+The next step is to implement the controller of the form $\bm{u = Pr-Kx}$, where $\bm{K}$ is the matrix corresponding to the linear quadratic regulator (LQR). The control input $\bm{u = -Kx}$ optimizes our cost function
+\begin{equation}
+    J = \int_{0}^{\infty} (\bm{x}^{T}(t)\bm{Qx}(t)+\bm{u}^{T}(t)\bm{Ru}(t)) dt
+\end{equation}
+
+$\bm{Q}$ and $\bm{R}$ are the weighting matrices in our LQR. To find the values of these matrices, Brysons rule can be used:
+
+\begin{equation}
+  Q_{ii} = \frac{1}{\text{maximum acceptable value of }x_i^2}
+\end{equation}
+\begin{equation}
+  R_{jj} = \frac{1}{\text{maximum acceptable value of }u_j^2}
+\end{equation}
+where $x_i$ represents the $i^{th}$ state and $u_j$ represents the
+$j^{th}$ input. Both matrices are diagonal, hence all other values in $\bm{Q}$ and $\bm{R}$ are 0. 
+
+\newline
+From this we got some values to work with, and after some tuning of the helicopter we ended up with the following matrices 
+
+\begin{equation}
+    \label{eq:Q}
+  \bm{Q} =
+  \begin{bmatrix}
+    10 & 0 & 0 \\
+    0  & 5 & 0 \\
+    0  & 0 & 5 \\
+  \end{bmatrix}
+  \qquad
+  \bm{R} =
+  \begin{bmatrix}
+    1 & 0 \\
+    0 & 1 \\
+  \end{bmatrix}
+\end{equation}
+\newline
+
+With $\bm{Q}$ and $\bm{R}$ set, we need to set the matrix $\bm{K}$. This can be obtained by using the MATLAB function \textit{K = lqr(A, B, Q, R)} and gave us:
+
+\begin{equation}
+    \bm{K} = 
+    \begin{bmatrix}
+     0  & 0 & 2.2361 \\
+    2.1623  & 2.4062   & 0 \\
+    \end{bmatrix}
+\end{equation}
+\newline
+
+The last matrix to set is $\bm{P}$. This matrix is in theory set such that $\lim_{t\rightarrow \infty}\tilde{p}(t) = \tilde{p}_c$ and $\lim_{t\rightarrow \infty}\dot{\tilde{e}}(t) = \dot{\tilde{e}}_c$ for fixed values of $\tilde{p}_c$ and $\dot{\tilde{e}}_c$. From this we can derive out the expression for $\bm{P}$:
+
+\begin{align*}
+  \dot{\boldsymbol{x}} &= \boldsymbol{Ax} + \boldsymbol{Bu} \\
+                       &= \boldsymbol{Ax} +
+                         \boldsymbol{B}(\boldsymbol{Pr} -
+                         \boldsymbol{Kx}) \\
+                       &= (\boldsymbol{A}-\boldsymbol{BK})\boldsymbol{x}
+                         + \boldsymbol{BPr} = 0
+\end{align*}
+
+Our system has reached equilibrium when $\bm{\dot{x}} = 0$, hence $\bm{x = x_\infty}$.
+
+\begin{align*}
+  (\boldsymbol{BK} - \boldsymbol{A})\boldsymbol{x_\infty} = \boldsymbol{BPr} \\
+  \Leftrightarrow \boldsymbol{x_\infty} = (\boldsymbol{BK} - \boldsymbol{A})^{-1}\boldsymbol{BPr} \\
+  \Rightarrow \boldsymbol{y_\infty} = \boldsymbol{Cx_\infty} = \boldsymbol{C}(\boldsymbol{BK} - \boldsymbol{A})^{-1}\boldsymbol{BPr}
+\end{align*}
+
+When time goes to infinity our output has reached the same value as our reference and we can finally express $\bm{P}$ as
+
+\begin{equation}
+  \boldsymbol{P} = [\boldsymbol{C}(\boldsymbol{BK} -
+  \boldsymbol{A})^{-1}\boldsymbol{B}]^{-1}
+\end{equation}
+\newline
+By putting this expression in MATLAB we calculated our $\bm{P}$ matrix to
+
+\begin{equation}
+    \bm{P} = 
+      \begin{bmatrix}
+    0 & 2.2361 \\
+    3.1623 & 0 \\
+  \end{bmatrix}
+\end{equation}
+
+\newpage
+
+ The implementation of the LQR-controller can be seen in Figure \ref{fig:P3p2-LQR_preg}. \newline
+ By applying Brysons rule to set the values in the $\bm{Q}$ matrix we got some initial values to start with. After several tests it became obvious that the values in this matrix has to be tuned some more. The response of the pitch rate was not as fast as we would like, and it ended up with the values as shown in (\ref{eq:Q}). Plots can be found from Figure \ref{fig:P3p2_elevation} to Figure \ref{fig:P3p2_pitchrate}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Problem 3}
+
+The controller is now implemented as a PI controller, where the elevation rate and the pitch angle are given an integral effect. Two additional states, $\gamma$ and $\zeta$, are given and their differential equations can be set to:
+
+\begin{align}
+  \begin{split}
+    \dot{\gamma} = \tilde{p}-\tilde{p}_c \\
+    \dot{\zeta} = \dot{\tilde{e}}-\dot{\tilde{e}}_c
+  \end{split}
+\end{align}
+
+\newline
+
+and hence we are also given a new state space vector and input vector:
+
+\begin{equation}
+  \label{eq:state_space_vectors}
+  \bm{x} =
+  \begin{bmatrix}
+    \tilde{p} \\
+    \dot{\tilde{p}} \\
+    \dot{\tilde{e}} \\
+    \gamma \\
+    \zeta \\
+  \end{bmatrix} ,
+  \quad \bm{u} =
+  \begin{bmatrix}
+    \tilde{V}_s \\
+    \tilde{V}_d \\
+  \end{bmatrix}
+\end{equation}
+
+\newline
+
+From this we get new dimensions for the matrices $\bm{A}$, $\bm{B}$, $\bm{K}$ and $\bm{Q}$, hence the new state space matrices are as following:
+
+\begin{equation}
+  \boldsymbol{A} = \begin{bmatrix}
+    0 & 1 & 0 & 0 & 0\\
+    0 & 0 & 0 & 0 & 0\\
+    0 & 0 & 0 & 0 & 0\\
+    1 & 0 & 0 & 0 & 0\\
+    0 & 0 & 1 & 0 & 0\\
+  \end{bmatrix}, \hspace{0.5cm}
+  \boldsymbol{B} = \begin{bmatrix}
+    0 & 0 \\
+    0 & K_1 \\
+    K_2 & 0 \\
+    0 & 0 \\
+    0 & 0 \\
+  \end{bmatrix}, \hspace{0.5cm}
+  \boldsymbol{C} = \begin{bmatrix}
+    1 & 0 & 0 & 0 & 0\\
+    0 & 0 & 1 & 0 & 0\\
+  \end{bmatrix}
+\end{equation}
+
+\newline
+
+For our LQR controller $\bm{Q}$ was expanded and therefore we had to tune new values: 
+
+\begin{equation}
+  Q =
+  \begin{bmatrix}
+    50 & 0   & 0  & 0 & 0 \\
+    0  & 30 & 0  & 0 & 0 \\
+    0  & 0   & 15 & 0 & 0 \\
+    0  & 0   & 0  & 2 & 0 \\
+    0  & 0   & 0  & 0 & 20 \\
+  \end{bmatrix}
+  \qquad
+  R =
+  \begin{bmatrix}
+    1 & 0 \\
+    0 & 1 \\
+  \end{bmatrix}
+\end{equation}
+\newline
+
+Implementation of the LQR can be found in Figure \ref{fig:P3p3-LQR_PIreg}, and plots can be found in Figure \ref{fig:P3p3_elevation} to Figure \ref{fig:P3p3_pitchrate}. 
+
+As seen in the figures the PI controller had a clearly positive impact on our system. The helicopter reached its equilibrium faster, and we immediately got a less underdamped system. The pitch rate is, as shown in the plots, without any steady state errors. 

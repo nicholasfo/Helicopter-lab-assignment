@@ -1,0 +1,89 @@
+\section{Part II - Monovariable control}
+
+In this part a controller for the pitch angle $\tilde{p}$ and travel rate $\dot{\tilde{\lambda}}$ will be designed. 
+
+%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Problem 1}
+A PD controller is being added to control the pitch angle in our system: 
+
+\begin{equation}
+    \label{v_d_tilde}
+    \tilde{V}_d = K_{pp}(\tilde{p}_c-\tilde{p}) - K_{pd}\dot{\tilde{p}}
+\end{equation}
+
+where $K_{pd}$ and $K_{pp}$ are constants greater than zero, and where $\tilde{p}_c$ is the desired reference for the pitch angle $\tilde{p}$. \newline
+
+Further on we derived the transfer function for $\frac{\tilde{p}(s)}{\tilde{p}_c(s)}$ by substituting (\ref{v_d_tilde}) into $\ddot{\tilde{p}} = K_1\tilde{V}_d$:
+
+\begin{align*}
+  \ddot{\tilde{p}} = K_1(K_{pp}(\tilde{p}_c-\tilde{p}) - K_{pd}\dot{\tilde{p}}) \\
+  \tilde{p}(s^{2}+K_1K_{pd}s+K_1K_{pp}) = \tilde{p}_c(K_1K_{pp})
+\end{align*}
+
+\begin{equation}
+    \label{transferfunction}
+    \frac{\tilde{p}(s)}{\tilde{p}_c(s)} = \frac{K_1K_{pp}}{s^{2}+K_1K_{pd}s+K_1K_{pp}}
+\end{equation}
+\newline
+
+To obtain expressions for finding $K_{pp}$ and $K_{pd}$ we can rewrite (\ref{transferfunction}) to the form:
+\begin{equation}
+    h(s)= \frac{\omega^{2}}{s^{2}+2\zeta\omega^{2}s + \omega^{2}}
+\end{equation}
+\newline
+
+Hence we get the following calculation:
+
+\begin{equation}
+    \omega = \sqrt{K_1K_{pp}}
+\end{equation}
+\begin{equation}
+       2\zeta\omega^{2} = K_1K_{pd} \nonumber
+\end{equation}
+\begin{equation}
+    \zeta = \frac{K_1K_{pd}}{2\omega^{2}} = \frac{K_{pd}}{2K_{pp}}
+    \raisetag{2\normalbaselineskip}
+\end{equation}
+
+Having in mind that a critical damped system equals to $\zeta = 1$, we get the following:
+\begin{equation}
+\label{kpdkpp}
+    K_{pd} = 2K_{pp}
+\end{equation}
+\newpage
+
+By using (\ref{kpdkpp}) one can finally implement the constants in our regulator.  We first chose the parameters by setting $K_{pd}$ and then tuned the controller based on these parameters until we were pleased with the response of the helicopter. In the end we made the system slightly underdamped and ended up with $K_{pd} = 7$ and $K_{pp} = 10$, giving us the response we wanted. \newline
+
+There were no doubt that the PD-regulator worked a lot better than controlling the helicopter only with feed forward. It instantly felt ''smoother'' to control and one can clearly feel the effect of implementing the PD-regulator to the system. 
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Problem 2}
+
+We are now adding a simple P controller to our system for controlling the travel rate $\dot{\tilde{\lambda}}$: 
+
+\begin{equation}
+    \label{tildepc}
+    \tilde{p}_c = K_{rp}(\dot{\tilde{\lambda}}_c-\dot{\tilde{\lambda}})
+\end{equation}
+\newline
+with constant $K_{rp} < 0$, and assuming the pitch angle is controlled perfectly, giving us $\tilde{p} = \tilde{p}_c$. By substituting (\ref{tildepc}) into $\ddot{\tilde{\lambda}} = K_3\tilde{p}}$ with our recent assumptions, we get the following calculation: 
+
+\begin{equation}
+    \label{massevas}
+    \frac{\ddot{\tilde{\lambda}}}{K_3} = K_{rp}(\dot{\tilde{\lambda}}_c-\dot{\tilde{\lambda}}) \overset{\mathcal{L}}{\Rightarrow}
+    s\dot{\tilde{\lambda}} = K_3K_{rp}(\dot{\tilde{\lambda}}_c-\dot{\tilde{\lambda}})
+    \Rightarrow
+    \frac{\dot{\tilde{\lambda}}}{\dot{\tilde{\lambda}}_c} = \frac{K_3K_{rp}}{s + K_3K_{rp}}
+\end{equation}
+\newline
+By setting $\rho = K_3K_{rp}$ we can rewrite (\ref{massevas}) to:
+
+\begin{equation}
+    \frac{\dot{\tilde{\lambda}}}{\dot{\tilde{\lambda}}_c} = \frac{\rho}{s + \rho}
+\end{equation}
+\newline
+
+We chose $K_{rp} = -2$ and this led to a relative quick response. By testing with increasingly more negative values, our system became unstable relatively fast, so we concluded that we had found the best parameter for our system. \newline \\
+In addition to this we put a gain of 0.8 to the output of the joystick to make it less sensitive while maneuvering the helicopter. 

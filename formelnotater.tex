@@ -1,0 +1,70 @@
+%J_p=2m_pl_p^2
+%\\\ddot{p}=\frac{L_1}{J_p} V_d=\frac{K_fl_p}{2m_pl_p^2}V_d=\frac{K_f}{2m_pl_p}V_d \\
+
+ J_p\ddot{p}=L_1V_d
+\\J_e\ddot{e}=L_2cos(e)+L_3V_scos(p)  
+\\J_\lambda\ddot{\lambda}=L_4V_ssin(p)cos(e)
+\\
+\\Finner pådraget for likevektspunktet (x^*,u^*) hvor helikopteret er horisontalt.
+\\\ddot{p}=\ddot{e}=\ddot{\lambda}=0
+\\0=L_1V_d^* -> V_d^* = 0
+\\0=L_2cos(0)+L_3V_s^*cos(0) ->V_s^*=-L_2/L_3
+\\
+\\f_p=\ddot{p}=L_1/J_p \cdot V_d
+\\f_e=\ddot{e}=L_2/J_e\cdot cos(e)+L_3/J_e\cdot V_s cos(p)
+\\f_\lambda=\ddot{\lambda}=L_4/J_\lambda\cdot V_s sin(p)cos(e)
+\\
+\\ \ddot{x}=Ax+Bu, 
+x=\begin{bmatrix}
+p\\ 
+e\\ 
+\lambda
+\end{bmatrix}, u=\begin{bmatrix} V_s\\ V_d \end{bmatrix}
+\\x^*=\begin{bmatrix}
+p^*\\ e^*\\ \lambda^*
+\end{bmatrix} = \begin{bmatrix}
+0 \\ 0 \\ 0
+\end{bmatrix}, u^*=\begin{bmatrix} V_s^* \\ V_d^* \end{bmatrix}= \begin{bmatrix} -L_2/L_3 \\ 0 \end{bmatrix}
+
+
+\\\\A=\begin{bmatrix}
+\frac{\partial f_p}{\partial p}&\frac{\partial f_p}{\partial e}  & \frac{\partial f_p}{\partial \lambda} \\ 
+\frac{\partial f_e}{\partial p}&\frac{\partial f_e}{\partial e}  & \frac{\partial f_e}{\partial \lambda} \\ 
+\frac{\partial f_\lambda}{\partial p}&\frac{\partial f_\lambda}{\partial e}  & \frac{\partial f_\lambda}{\partial \lambda}
+\end{bmatrix}_(_x_=_x_^*,u=u^*)
+
+\\
+=\begin{bmatrix}
+0 & 0 & 0 \\
+L_3/J_e(-sin(p)) & L_2/J_e(-sin(e)) & 0 \\
+L_4/J_\lambda V_s cos(p)cos(e) & L_4/J_\lambda sin(p)(-sin(e)) & 0 
+ \end{bmatrix}_(_x_=_x^* _,_u_=_u^* _) =
+\begin{bmatrix}
+0 & 0 & 0 \\
+0 & 0 & 0 \\
+L_4/J_\lambda \cdot V_s^* & 0 & 0 \\
+\end{bmatrix}
+
+\\
+\\B=\begin{bmatrix}
+\frac{\partial f_p}{\partial V_s} & \frac{\partial f_p}{\partial V_d} \\ \frac{f_e}{\partial V_s} & \frac{\partial f_e}{\partial V_d} \\ \frac{\partial f_\lambda}{\partial V_s} & \frac{\partial f_\lambda}{\partial V_d} \\
+\end{bmatrix}_(_x_=_x^* _,_u_=_u^* _) 
+\\=\begin{bmatrix}
+0 & L_1/J_p \\
+L_3/J_e\cdot cos(p) & 0 \\
+L_4/J_\lambda \cdot sin(p)cos(e) & 0 
+\end{bmatrix}_(_x_=_x^* _,_u_=_u^* _) 
+=\begin{bmatrix}
+0 & L_1/J_p \\
+L_3/J_e & 0 \\
+0 & 0
+\end{bmatrix}
+=\begin{bmatrix}
+0 & K_1 \\
+K_2 & 0 \\
+0 & 0
+\end{bmatrix}
+\\K_1=L_1/J_p, K_2=L_3/J_e
+
+
+
